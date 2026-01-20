@@ -31,7 +31,7 @@ case "$action" in
 		exec $setenv $action.sh
 	fi
 	;;
-"install"|"upgrade"|"dhcp"|"linux")
+"install"|"upgrade"|"dhcp"|"linux"|"netbsd")
 	if ! test -f /home/$USER/env/install; then no_command; fi
 	if $setenv checklock.sh; then
 		shift

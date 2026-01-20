@@ -20,7 +20,7 @@ EOF
 setup=$1
 shift
 case "$setup" in
-install|upgrade|dhcp|linux)
+install|upgrade|dhcp|linux|netbsd)
 	;;
 *)
 	usage
@@ -211,6 +211,21 @@ if [ "$setup" == "linux" ]; then
 	set_dhcpd_conf on pxelinux.0
 	power.sh cycle
 	linuxboot.expect
+	set_dhcpd_conf off
+	exit 0
+fi
+
+if [ "$setup" == "netbsd" ]; then
+	rm -f -- $tftp_dir/netpxeboot $tftp_dir/netx64.efi $tftp_dir/netbsd
+	cp $tftp_home/netbsd/amd64/pxeboot_ia32.bin $tftp_dir/netpxeboot
+	cp $tftp_home/netbsd/amd64/bootx64.efi $tftp_dir/netx64.efi
+	gzcat $tftp_home/netbsd/amd64/netbsd-INSTALL.gz >$tftp_dir/netbsd
+	cat >$tftp_dir/boot.cfg <<EOF
+boot tftp:netbsd
+EOF
+	set_dhcpd_conf on netpxeboot
+	power.sh cycle
+	login.expect
 	set_dhcpd_conf off
 	exit 0
 fi
